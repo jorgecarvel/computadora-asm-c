@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include "cpu.h"
+#include "alu.h"
+#include "memoria.h"
+
+void cpu_ejecutar(CPU *cpu) {
+    // Programa mínimo: suma de 2 números en memoria
+    uint8_t val1 = memoria_leer(cpu->mem, 0);
+    uint8_t val2 = memoria_leer(cpu->mem, 1);
+    cpu->A = alu_suma(val1, val2);
+    printf("Resultado suma: %d\n", cpu->A);
+}
+
+int main() {
+    Memoria mem;
+    memoria_init(&mem);
+    // Valores de prueba
+    mem.data[0] = 30;
+    mem.data[1] = 20;
+
+    CPU cpu;
+    cpu_init(&cpu, &mem);
+    cpu_ejecutar(&cpu);
+
+    return 0;
+}
+

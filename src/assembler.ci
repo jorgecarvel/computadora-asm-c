@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_LINE 128
+
+// Función auxiliar: elimina saltos de línea y espacios extras
+void trim(char *str) {
+    char *end;
+    while (isspace((unsigned char)*str)) str++;
+    if (*str == 0) return;
+    end = str + strlen(str) - 1;
+    while (end > str && isspace((unsigned char)*end)) end--;
+    end[1] = '\0';
+}
+
+// Traduce una instrucción ASM simple a "binario" simbólico
+void traducir_a_binario(const char *linea, char *binario) {
+    if (strncmp(linea, "MOV", 3) == 0)
+        strcpy(binario, "0001");
+    else if (strncmp(linea, "ADD", 3) == 0)
+        strcpy(binario, "0010");
+    else if (strncmp(linea, "SUB", 3) == 0)
+        strcpy(binario, "0011");
+    else if (strncmp(linea, "STORE", 5) == 0)
+        strcpy(binario, "0100");
+    else if (strncmp(linea, "LOAD", 4) == 0)
+        strcpy(binario, "0101");
+    else if (strncmp(linea, "HALT", 4) == 0)
+        strcpy(binario, "1111");
+    else
+        strcpy(binario, "0000"); // desconocida
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "Uso: %s <entrada.asm> <salida.mem>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *in = fopen(argv[1], "r");
+    if (!in) {
+        perror("Error abriendo archivo de entrada");
+        return 1;
+    }
+
+    FILE *out = fopen(argv[2], "w");
+    if (!out) {
+        perror("Error creando archivo de salida");
+        fclose(in);
+        return 1;
+    }
+
+    printf("[INFO] Ensamblador iniciado...\n");
+    printf("[READ] Leyendo %s\n", argv[1]);
+
+    char linea[MAX_LINE];
+    char binario[16];
+    int numLinea = 0;
+
+    while (fgets(linea, sizeof(linea), in)) {
+        trim(linea);
+        if (strlen(linea) == 0 || linea[0] == ';') continue;
+
+        numLinea++;
+        traducir_a_binario(linea, binario);
+        fprintf(out, "%s ; %s\n", binario, linea);
+        printf("[TRANSLATE] %s -> %s\n", linea, binario);
+    }
+
+    fclose(in);
+    fclose(out);
+
+    printf("[OK] Traducción completa: %s → %s\n", argv[1], argv[2]);
+    return 0;
+}
+
+
