@@ -65,3 +65,8 @@ run: mem $(CPU)
 clean:
 	rm -rf $(BUILD_DIR)/*
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 3f14a8867c6b4f7bdc29a45de37cf8e4e9dfae36
